@@ -1,71 +1,11 @@
 import { check, sleep } from "k6";
 import { trends } from "../metrics/trends.js";
 import { createFakeUser } from "../utils/fakerAddress.js";
+import { PerformanceVitals } from "../utils/performanceVitals.js";
 
 export class AddressPage {
   constructor(page) {
     this.page = page;
-  }
-
-  async addVitals() {
-    return await this.page.evaluate(() => {
-      const nav =
-        performance.getEntriesByType("navigation")[0] || performance.timing;
-
-      // ---- Web Vitals ----
-      const lcpEntry = performance
-        .getEntriesByType("largest-contentful-paint")
-        .pop();
-
-      const fcpEntry = performance
-        .getEntriesByName("first-contentful-paint")
-        .pop();
-
-      // ---- Raw timing values (Navigation Timing) ----
-      const ttfb = nav.responseStart - nav.requestStart;
-      const timeToLastByte = nav.responseEnd - nav.requestStart;
-      const latency = nav.responseStart - nav.fetchStart;
-
-      const domInteractive = nav.domInteractive - nav.fetchStart;
-      const domComplete = nav.domComplete - nav.fetchStart;
-
-      const firstResponseTime = nav.responseStart - nav.fetchStart;
-      const contentDownload = nav.responseEnd - nav.responseStart;
-
-      const networkOverhead =
-        nav.connectEnd -
-        nav.connectStart +
-        (nav.secureConnectionStart > 0
-          ? nav.connectEnd - nav.secureConnectionStart
-          : 0);
-
-      // ---- Derived / semantic timings ----
-      const pageCompletionTime = domComplete;
-      const pageReady = nav.domContentLoadedEventEnd - nav.fetchStart;
-      const firstInteractive = domInteractive;
-
-      return {
-        // Web vitals
-        lcp: lcpEntry ? Math.round(lcpEntry.startTime) : 0,
-        fcp: fcpEntry ? Math.round(fcpEntry.startTime) : 0,
-
-        // Requested metrics
-        timeToFirstByte: Math.round(ttfb),
-        timeToLastByte: Math.round(timeToLastByte),
-
-        pageCompletionTime: Math.round(pageCompletionTime),
-        latency: Math.round(latency),
-
-        domInteractive: Math.round(domInteractive),
-        networkOverhead: Math.round(networkOverhead),
-
-        firstResponseTime: Math.round(firstResponseTime),
-        contentDownload: Math.round(contentDownload),
-
-        pageReady: Math.round(pageReady),
-        firstInteractive: Math.round(firstInteractive),
-      };
-    });
   }
 
   // ---------------------------
@@ -79,29 +19,76 @@ export class AddressPage {
 
     await this.page.waitForLoadState("networkidle");
 
-    // ---- Web Vitals extraction (safe) ----
-    const vitals = await this.addVitals();
+    const vitals = await new PerformanceVitals(this.page).collect();
 
-    // ALWAYS add numeric samples
-    trends.addressPageLcp.add(vitals.lcp);
-    trends.addressPageFcp.add(vitals.fcp);
-    trends.addressPageTtfb.add(vitals.timeToFirstByte);
-    trends.addressPageTtlb.add(vitals.timeToLastByte);
-    trends.addressPageCompletionTime.add(vitals.pageCompletionTime);
-    trends.addressPageLatency.add(vitals.latency);
-    trends.addressPageDomInteractive.add(vitals.domInteractive);
-    trends.addressPageNetworkOverhead.add(vitals.networkOverhead);
-    trends.addressPageFirstResponseTime.add(vitals.firstResponseTime);
-    trends.addressPageContentDownload.add(vitals.contentDownload);
-    trends.addressPageReady.add(vitals.pageReady);
-    trends.addressPageFirstInteractive.add(vitals.firstInteractive);
+    // ---- Web vitals + timing (TAGGED) ----
+    trends.addressPageLcp.add(vitals.lcp, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageFcp.add(vitals.fcp, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageTtfb.add(vitals.timeToFirstByte, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageTtlb.add(vitals.timeToLastByte, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageCompletionTime.add(vitals.pageCompletionTime, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageLatency.add(vitals.latency, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageDomInteractive.add(vitals.domInteractive, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageNetworkOverhead.add(vitals.networkOverhead, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageFirstResponseTime.add(vitals.firstResponseTime, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageContentDownload.add(vitals.contentDownload, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageReady.add(vitals.pageReady, {
+      page: "address",
+      step: "open",
+    });
+
+    trends.addressPageFirstInteractive.add(vitals.firstInteractive, {
+      page: "address",
+      step: "open",
+    });
 
     const heading = await this.page
       .getByRole("heading", { name: "Address Book Entries" })
       .textContent();
 
     check(heading, {
-      "✔ Address page loaded": (t) => t && t.includes("Address Book Entries"),
+      "✔ Address page loaded": (t) =>
+        t && t.includes("Address Book Entries"),
     });
   }
 
@@ -112,17 +99,22 @@ export class AddressPage {
     const start = Date.now();
 
     await this.page.getByRole("link", { name: "Edit" }).first().click();
-
     await this.page.waitForLoadState("networkidle");
 
-    trends.editAddress.add(Date.now() - start);
+    // ---- Action timing (TAGGED) ----
+   
 
-    // ---- Web Vitals extraction (safe) ----
-    const vitals = await this.addVitals();
+    const vitals = await new PerformanceVitals(this.page).collect();
 
-    // ALWAYS add numeric samples
-    trends.lcpAddressPageEdit.add(vitals.lcp);
-    trends.fcpAddressPageEdit.add(vitals.fcp);
+    trends.lcpAddressPageEdit.add(vitals.lcp, {
+      page: "address",
+      step: "edit_page",
+    });
+
+    trends.fcpAddressPageEdit.add(vitals.fcp, {
+      page: "address",
+      step: "edit_page",
+    });
   }
 
   // ---------------------------
@@ -135,14 +127,20 @@ export class AddressPage {
     await this.page.getByLabel("First Name").fill(user.firstName);
     await this.page.getByLabel("Last Name").fill(user.lastName);
 
-    // ---- Web Vitals extraction (safe) ----
-    const vitals = await this.addVitals();
+    // ---- Interaction timing (TAGGED) ----
+    
 
-    // ALWAYS add numeric samples
-    trends.lcpAddressFillForm.add(vitals.lcp);
-    trends.fcpAddressFillForm.add(vitals.fcp);
+    const vitals = await new PerformanceVitals(this.page).collect();
 
-    trends.fillAddressForm.add(Date.now() - start);
+    trends.lcpAddressFillForm.add(vitals.lcp, {
+      page: "address",
+      step: "fill_form",
+    });
+
+    trends.fcpAddressFillForm.add(vitals.fcp, {
+      page: "address",
+      step: "fill_form",
+    });
 
     sleep(2);
   }
