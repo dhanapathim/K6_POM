@@ -1,8 +1,11 @@
 import { trends } from '../metrics/trends.js';
 import { PerformanceVitals } from '../utils/performanceVitals.js';
+import { safeAdd } from "../utils/metricUtils.js";
+
 export class ChallengesPage {
   constructor(page) {
     this.page = page;
+    this.pageTag = "challenges";
   }
 
   async openChallenges() {
@@ -11,19 +14,23 @@ export class ChallengesPage {
     await this.page.screenshot({ path: `screenshots/challenges_${__VU}.png` });
     const vitals = await new PerformanceVitals(this.page).collect();
 
-    trends.challengespageOpenlcp.add(vitals.lcp,{page: "Challenges", step: "open",});
-    trends.challengespageOpenfcp.add(vitals.fcp,{page: "Challenges", step: "open",});
-    trends.challengespageOpenttfb.add(vitals.ttfb,{page: "Challenges", step: "open",});
-    trends.challengespageOpenttlb.add(vitals.ttlb,{page: "Challenges", step: "open",});
-    trends.challengespageOpencompletiontime.add(vitals.completionTime,{page: "Challenges", step: "open",});
-    trends.challengespageOpenlatency.add(vitals.latency,{page: "Challenges", step: "open",});
-    trends.challengespageOpendominteractive.add(vitals.domInteractive,{page: "Challenges", step: "open",});
-    trends.challengespageOpennetworkoverhead.add(vitals.networkOverhead,{page: "Challenges", step: "open",});
-    trends.challengespageOpenfirstresponsetime.add(vitals.firstResponseTime,{page: "Challenges", step: "open",});
-    trends.challengespageOpencontentdownload.add(vitals.contentDownload,{page: "Challenges", step: "open",});
-    trends.challengespageOpenready.add(vitals.pageReady,{page: "Challenges", step: "open",});
-    trends.challengespageOpenfirstinteractive.add(vitals.firstInteractive,{page: "Challenges", step: "open",});
+    const tags = { page: this.pageTag, step: "open" };
 
+    safeAdd(trends.challengespageOpenlcp, vitals.lcp, tags);
+    safeAdd(trends.challengespageOpenfcp, vitals.fcp, tags);
+    safeAdd(trends.challengespageOpenttfb, vitals.ttfb, tags);
+    safeAdd(trends.challengespageOpenttlb, vitals.ttlb, tags);
+    safeAdd(trends.challengespageOpencompletiontime, vitals.completionTime, tags);
+    safeAdd(trends.challengespageOpenlatency, vitals.latency, tags);
+    safeAdd(trends.challengespageOpendominteractive, vitals.domInteractive, tags);
+    safeAdd(trends.challengespageOpennetworkoverhead, vitals.networkOverhead, tags);
+    safeAdd(trends.challengespageOpenfirstresponsetime, vitals.firstResponseTime, tags);
+    safeAdd(trends.challengespageOpencontentdownload, vitals.contentDownload, tags);
+    safeAdd(trends.challengespageOpenready, vitals.pageReady, tags);
+    safeAdd(trends.challengespageOpenfirstinteractive, vitals.firstInteractive, tags);
+
+
+    
   }
 
   async openMiddleManagers() {
@@ -32,18 +39,21 @@ export class ChallengesPage {
     await this.page.screenshot({ path: `screenshots/MiddleManagers_${__VU}.png` });
     const vitals = await new PerformanceVitals(this.page).collect();
 
-    trends.middlemanagerspageOpenlcp.add(vitals.lcp,{page: "MiddleManagers" });
-    trends.middlemanagerspageOpenfcp.add(vitals.fcp,{page: "MiddleManagers" });
-    trends.middlemanagerspageOpenttfb.add(vitals.ttfb,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpenttlb.add(vitals.ttlb,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpencompletiontime.add(vitals.completionTime,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpenlatency.add(vitals.latency,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpendominteractive.add(vitals.domInteractive,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpennetworkoverhead.add(vitals.networkOverhead,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpenfirstresponsetime.add(vitals.firstResponseTime,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpencontentdownload.add(vitals.contentDownload,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpenready.add(vitals.pageReady,{page: "MiddleManagers"});
-    trends.middlemanagerspageOpenfirstinteractive.add(vitals.firstInteractive,{page: "MiddleManagers"});
+    const tags = { page: "MiddleManagers" };
+
+    safeAdd(trends.middlemanagerspageOpenlcp, vitals.lcp, tags);
+    safeAdd(trends.middlemanagerspageOpenfcp, vitals.fcp, tags);
+    safeAdd(trends.middlemanagerspageOpenttfb, vitals.ttfb, tags);
+    safeAdd(trends.middlemanagerspageOpenttlb, vitals.ttlb, tags);
+    safeAdd(trends.middlemanagerspageOpencompletiontime, vitals.completionTime, tags);
+    safeAdd(trends.middlemanagerspageOpenlatency, vitals.latency, tags);
+    safeAdd(trends.middlemanagerspageOpendominteractive, vitals.domInteractive, tags);
+    safeAdd(trends.middlemanagerspageOpennetworkoverhead, vitals.networkOverhead, tags);
+    safeAdd(trends.middlemanagerspageOpenfirstresponsetime, vitals.firstResponseTime, tags);
+    safeAdd(trends.middlemanagerspageOpencontentdownload, vitals.contentDownload, tags);
+    safeAdd(trends.middlemanagerspageOpenready, vitals.pageReady, tags);
+    safeAdd(trends.middlemanagerspageOpenfirstinteractive, vitals.firstInteractive, tags);
+
 
   }
 }

@@ -122,11 +122,12 @@ export class AddressPage {
   // ---------------------------
   async fillForm() {
     const user = createFakeUser(__VU);
-    const start = Date.now();
+   
 
     await this.page.getByLabel("First Name").fill(user.firstName);
     await this.page.getByLabel("Last Name").fill(user.lastName);
 
+    await this.page.waitForLoadState("networkidle");
     // ---- Interaction timing (TAGGED) ----
     
 

@@ -26,18 +26,16 @@ export async function userScenario() {
   // Challenges Page
   await challenges.openChallenges();
   await challenges.openMiddleManagers();
-
-  // Leadership Page
-  await leadership.openLeadershipProgram();
-  await leadership.openFrontlineLeader();
-  await leadership.openFrontlineProgram();
   sleep(2);
-
   // Contact Us Page
   await contact.openForm();
   sleep(2);
   await contact.fillForm();
   sleep(2);
+
+  await page.close();
+  await context.close();
+   sleep(2);
 }
 
 

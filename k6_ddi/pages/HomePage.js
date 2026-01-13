@@ -1,34 +1,35 @@
 import { check } from "k6";
 import { trends } from "../metrics/trends.js";
 import { PerformanceVitals } from '../utils/performanceVitals.js';
-
+import { safeAdd } from "../utils/metricUtils.js";
 export class HomePage {
   constructor(page) {
     this.page = page;
+    this.pageTag = "homepage";
     this.heroText = page.locator(
       '//p[text()="Build leaders for the business you\'re becoming."]'
     );
   }
 
   async open() {
-    const start = Date.now();
+
     await this.page.goto("https://www.ddi.com/", { waitUntil: "load" });
 
     const vitals = await new PerformanceVitals(this.page).collect();
 
-    trends.HomePage_open_lcp.add(vitals.lcp, { page: "Homepage", step: "open" });
-    trends.HomePage_open_fcp.add(vitals.fcp, { page: "Homepage", step: "open" });
-    trends.HomePage_open_ttfb.add(vitals.ttfb, { page: "Homepage", step: "open" });
-    trends.HomePage_open_ttlb.add(vitals.ttlb, { page: "Homepage", step: "open" });
-    trends.HomePage_open_completion_time.add(vitals.completionTime, { page: "Homepage", step: "open" });
-    trends.HomePage_open_latency.add(vitals.latency, { page: "Homepage", step: "open" });
-    trends.HomePage_open_dom_interactive.add(vitals.domInteractive, { page: "Homepage", step: "open" });
-    trends.HomePage_open_network_overhead.add(vitals.networkOverhead, { page: "Homepage", step: "open" });
-    trends.HomePage_open_first_response_time.add(vitals.firstResponseTime, { page: "Homepage", step: "open" });
-    trends.HomePage_open_content_download.add(vitals.contentDownload, { page: "Homepage", step: "open" });
-    trends.HomePage_open_page_ready.add(vitals.pageReady, { page: "Homepage", step: "open" });
-    trends.HomePage_open_first_interactive.add(vitals.firstInteractive, { page: "Homepage", step: "open" });
-    
+    const tags = { page: this.pageTag, step: "open" };
+    safeAdd(trends.HomePage_open_lcp, vitals.lcp, tags);
+    safeAdd(trends.HomePage_open_fcp, vitals.fcp, tags);
+    safeAdd(trends.HomePage_open_ttfb, vitals.ttfb, tags);
+    safeAdd(trends.HomePage_open_ttlb, vitals.ttlb, tags);
+    safeAdd(trends.HomePage_open_latency, vitals.latency, tags);
+    safeAdd(trends.HomePage_open_dom_interactive, vitals.domInteractive, tags);
+    safeAdd(trends.HomePage_open_network_overhead, vitals.networkOverhead, tags);
+    safeAdd(trends.HomePage_open_first_response_time, vitals.firstResponseTime, tags);
+    safeAdd(trends.HomePage_open_content_download, vitals.contentDownload, tags);
+    safeAdd(trends.HomePage_open_page_ready, vitals.pageReady, tags);
+    safeAdd(trends.HomePage_open_first_interactive, vitals.firstInteractive, tags);
+
     this.page.click("//button[@data-tid='banner-decline']");
     const text = await this.heroText.textContent();
     check(text, {

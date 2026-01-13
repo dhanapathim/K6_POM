@@ -6,7 +6,7 @@ export class WishlistPage {
   }
 
   async open() {
-    const start = Date.now();
+   
     await this.page.getByRole('link', { name: ' Wish List' }).click();
     await this.page.waitForLoadState('networkidle');
 
