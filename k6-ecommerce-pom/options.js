@@ -13,7 +13,11 @@ export const options = {
     },
   },
   cloud: {
-    projectID: 6390132,
-    name: "From Local",
-  }
+    projectID: 6387331,
+    name: "From Local Ecommerce",
+    distribution: {
+      "mumbai-india": { loadZone: "amazon:in:mumbai", percent: 100 },
+      // "frankfurt-germany": { loadZone: "amazon:de:frankfurt", percent: 50 },
+    },
+  },
 };
